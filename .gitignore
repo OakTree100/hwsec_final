@@ -1,0 +1,6 @@
+signed_firmware/*.o
+signed_firmware/*.d
+signed_firmware/*.lst
+unsigned_firmware/*.o
+unsigned_firmware/*.d
+unsigned_firmware/*.lst
