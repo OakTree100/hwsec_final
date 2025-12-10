@@ -42,6 +42,8 @@
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 
+// uint8_t sign[] __attribute__((section(".mystrings"))) = "Fraudd\n";
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -57,6 +59,41 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void check_str() {
+    uint8_t a[] = "check\n\r";
+    HAL_UART_Transmit(&huart2, a, 7, 0xffffffff);
+    extern const char __rodata_start;
+    uint32_t* rd_ptr = &__rodata_start;
+    // Big endian
+    // uint32_t v1 = 0x5369676e;
+    // uint32_t v2 = 0x65640a00;
+    uint32_t v1 = 0x6e676953;
+    uint32_t v2 = 0x000a6465;
+
+    extern const char _sdata;
+    uint32_t* sdata_ptr = &_sdata;
+    
+    
+    
+    HAL_UART_Transmit(&huart2, (uint8_t*)&v1, 4, 0xffffffff);
+    HAL_UART_Transmit(&huart2, (uint8_t*)&v2, 4, 0xffffffff);
+    HAL_UART_Transmit(&huart2, a, 7, 0xffffffff);
+    HAL_UART_Transmit(&huart2, (uint8_t*)&rd_ptr[0], 4, 0xffffffff);
+    HAL_UART_Transmit(&huart2, (uint8_t*)&rd_ptr[1], 4, 0xffffffff);
+    HAL_UART_Transmit(&huart2, a, 7, 0xffffffff);
+    HAL_UART_Transmit(&huart2, (uint8_t*)sdata_ptr, 4, 0xffffffff);
+    if (v1 == rd_ptr[0]) {
+      HAL_UART_Transmit(&huart2, "1 T\n\r", 5, 0xffffffff);
+    } else {
+      HAL_UART_Transmit(&huart2, "1 F\n\r", 5, 0xffffffff);
+    }
+    if (v2 == rd_ptr[1]) {
+      HAL_UART_Transmit(&huart2, "2 T\n\r", 5, 0xffffffff);
+    } else {
+      HAL_UART_Transmit(&huart2, "2 F\n\r", 5, 0xffffffff);
+    }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -65,7 +102,8 @@ static void MX_USART2_UART_Init(void);
   */
 int main(void)
 {
-  char sign[] = "Fraudd\n";
+  uint8_t sign[] = "Fraudd\n";
+  uint8_t msg1[] = "EOF\n\r";
 
   /* USER CODE BEGIN 1 */
 
@@ -91,7 +129,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Transmit_IT(&huart2, sign, 7);
+  HAL_UART_Transmit(&huart2, sign, 7, 0xffffffff);
   HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
   int a = 0;
   int b = 1;
@@ -101,6 +139,9 @@ int main(void)
     a = a^b;
   }
   /* USER CODE END 2 */
+
+  check_str();
+  HAL_UART_Transmit(&huart2, msg1, 5, 0xffffffff);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
