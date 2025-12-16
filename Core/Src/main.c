@@ -41,9 +41,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
-uint8_t res[] = "Bad \n\r";
-
-// uint8_t sign[] __attribute__((section(".mystrings"))) = "Fraudd\n";
 
 /* USER CODE BEGIN PV */
 
@@ -60,26 +57,6 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void check_str() {
-    // Correct big endian str
-    uint32_t v1 = 0x6e676953;
-    uint32_t v2 = 0x000a6465;
-
-    extern const char _sdata;
-    uint32_t* sdata_ptr = (uint32_t*)&_sdata;
-    
-    if (v1 == sdata_ptr[0] && v2 == sdata_ptr[1]) {
-      res[0] = 'G';
-      res[1] = 'o';
-      res[2] = 'o';
-      res[3] = 'd';
-      res[4] = '\n';
-      res[5] = '\r';
-      return;
-    }
-    // Would Infinite loop here
-}
-
 /* USER CODE END 0 */
 
 /**
@@ -88,8 +65,8 @@ void check_str() {
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
-  check_str();
 
   /* USER CODE END 1 */
 
@@ -113,24 +90,21 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Transmit(&huart2, res, 6, 0xffffffff);
-  /* USER CODE END 2 */
 
-  extern const char _sdata;
-  uint32_t* sdata_ptr = (uint32_t*)&_sdata;
-  HAL_UART_Transmit(&huart2, (uint8_t*)sdata_ptr, 8, 0xffffffff);
+  /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
     for (int i = 0; i < 0x1000000; i++) {
         if (i == 0) {
             HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 
         }
     }
-    /* USER CODE END WHILE */
+
 
     /* USER CODE BEGIN 3 */
   }

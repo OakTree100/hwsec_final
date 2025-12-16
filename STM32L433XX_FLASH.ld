@@ -93,12 +93,10 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
-  PROVIDE(__rodata_start = .);
   /* Constant data goes into FLASH */
   .rodata :
   {
     . = ALIGN(8);
-    __rodata_start = .;
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
     . = ALIGN(8);
@@ -154,11 +152,12 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
+PROVIDE (_sdata = .);
   .data : 
   {
     . = ALIGN(8);
     _sdata = .;        /* create a global symbol at data start */
-    QUAD(0x000a64656e676943); /* Cigned */
+    QUAD(0x000a64656e676943);
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
     *(.RamFunc)        /* .RamFunc sections */

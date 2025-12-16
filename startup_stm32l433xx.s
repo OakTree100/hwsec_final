@@ -46,8 +46,14 @@ defined in linker script */
 .word	_ebss
 
 .equ  BootRAM,        0xF1E0F85F
-
-
+/**
+ * @brief  This is the code that gets called when the processor first
+ *          starts execution following a reset event. Only the absolutely
+ *          necessary set is performed, after which the application
+ *          supplied main() routine is called.
+ * @param  None
+ * @retval : None
+*/
 /**
  * @author: Isaac Garfield
  * @brief: Check first 8 bytes of _sdata matches KEY val
@@ -58,8 +64,23 @@ defined in linker script */
 	.weak	verify_boot
 	.type	verify_boot, %function
 verify_boot:
-  ldr r0, =_sdata
-  ldr r3, =0x20555942 /* Set "Bad " to "BYU " in memory */
+  ldr r3, =_sdata
+/*  ldr r3, =0x00000020 /* Just pull the variable from linker */
+/*  ldr r3, =0x20000000 */
+
+  ldr r1, =0x6e676953
+  ldr r2, [r3]
+  cmp r1, r2
+  bne Infinite_Loop
+  ldr r1, =0x000a6465
+  ldr r2, [r3]
+  cmp r1, r2
+  bne Infinite_Loop
+
+  b Reset_Handler
+
+/*  ldr r0, =_sdata
+  ldr r3, =0x20555942 / Set "Bad " to "BYU " in memory /
   str r3, [r0, #8]
 
   ldr r1, =0x6e676953
@@ -79,25 +100,13 @@ twoth:
   ldr r2, =0x00454545
   str r2, [r0, #4]
 
-  b Reset_Handler
+  b Reset_Handler */
 
-
-/**
- * @brief  This is the code that gets called when the processor first
- *          starts execution following a reset event. Only the absolutely
- *          necessary set is performed, after which the application
- *          supplied main() routine is called.
- * @param  None
- * @retval : None
-*/
     .section	.text.Reset_Handler
 	.weak	Reset_Handler
 	.type	Reset_Handler, %function
 Reset_Handler:
   ldr   sp, =_estack    /* Set stack pointer */
-  ldr r0, =_sdata
-  ldr r3, =0x20555942 /* Set "Bad " to "BYU " in memory */
-  str r3, [r0]
 
 /* Call the clock system initialization function.*/
     bl  SystemInit
