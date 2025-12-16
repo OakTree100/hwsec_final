@@ -49,7 +49,7 @@
 */
 
 /* Entry Point */
-ENTRY(Reset_Handler)
+ENTRY(verify_boot)
 
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM) + LENGTH(RAM);    /* end of RAM */
@@ -158,7 +158,7 @@ SECTIONS
   {
     . = ALIGN(8);
     _sdata = .;        /* create a global symbol at data start */
-    LONG(0x00636261); /* LONG(0x000a64656e676953); */
+    QUAD(0x000a64656e676943); /* Cigned */
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
     *(.RamFunc)        /* .RamFunc sections */

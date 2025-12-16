@@ -116,6 +116,9 @@ int main(void)
   HAL_UART_Transmit(&huart2, res, 6, 0xffffffff);
   /* USER CODE END 2 */
 
+  extern const char _sdata;
+  uint32_t* sdata_ptr = (uint32_t*)&_sdata;
+  HAL_UART_Transmit(&huart2, (uint8_t*)sdata_ptr, 8, 0xffffffff);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */

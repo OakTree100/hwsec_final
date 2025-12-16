@@ -46,6 +46,42 @@ defined in linker script */
 .word	_ebss
 
 .equ  BootRAM,        0xF1E0F85F
+
+
+/**
+ * @author: Isaac Garfield
+ * @brief: Check first 8 bytes of _sdata matches KEY val
+ *         Go to Infinite_Loop or Reset_Handler on answer
+ *
+*/
+    .section	.text.verify_boot
+	.weak	verify_boot
+	.type	verify_boot, %function
+verify_boot:
+  ldr r0, =_sdata
+  ldr r3, =0x20555942 /* Set "Bad " to "BYU " in memory */
+  str r3, [r0, #8]
+
+  ldr r1, =0x6e676953
+  ldr r2, [r0]
+  cmp r1, r2
+  bne oneth
+pt_two:
+  ldr r1, =0x000a6465
+  ldr r2, [r0, #4]
+  cmp r1, r2
+  bne twoth
+oneth:
+  ldr r2, =0x67676767
+  str r2, [r0]
+  b pt_two
+twoth:
+  ldr r2, =0x00454545
+  str r2, [r0, #4]
+
+  b Reset_Handler
+
+
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely
@@ -54,12 +90,14 @@ defined in linker script */
  * @param  None
  * @retval : None
 */
-
     .section	.text.Reset_Handler
 	.weak	Reset_Handler
 	.type	Reset_Handler, %function
 Reset_Handler:
   ldr   sp, =_estack    /* Set stack pointer */
+  ldr r0, =_sdata
+  ldr r3, =0x20555942 /* Set "Bad " to "BYU " in memory */
+  str r3, [r0]
 
 /* Call the clock system initialization function.*/
     bl  SystemInit
